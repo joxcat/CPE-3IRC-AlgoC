@@ -1,15 +1,14 @@
+**CONTRIBUTORS**
+1. PLANCHON Johan
+
 # Bibliothèques
-* 
-*
+* stdio.h
 
 # Références
-*
-*
+* https://www.tutorialspoint.com/cprogramming/c_constants.htm
+* https://stackoverflow.com/questions/7207391/the-tilde-operator-in-c
 
 # Difficulté
-*
-
-# Commentaires
-* 
-* 
+* Quelques difficultées a se rememorer les formules mathématiques
+* Utilisation des opérateurs binaires
 
