@@ -16,12 +16,10 @@ qui affiche la valeur du nombre **a** élevé à une puissance **b**. Par
 exemple, puissance(2,3) affiche la valeur 8. N'utilisez pas la fonction
 *pow()* (math.h).
 
-
 #### Exercice 2.2 [★]
 
-
 Considérez un entier d (**int d ;**). Écrivez le code *bits.c* qui
-vérifie si les 4eme et 20eme bits de **gauche** sont 1 (en binaire). Si
+vérifie si les 4eme et 20eme bits de **gauche** (en partant de la gauche) sont 1 (en binaire). Si
 les deux bits sont 1, il affiche 1 sinon 0.
 
 
