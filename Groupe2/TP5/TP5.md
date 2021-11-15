@@ -27,33 +27,33 @@ code du serveur. Sur l'autre, exécutez le code du client.
 #### Exercice 5.1 [★]
 
 
-Écrivez un programme en créant deux fichiers repertoire.h et
-repertoire.c qui utilisent l'interface en ligne de commande et prennent
+Écrivez un programme en créant deux fichiers *repertoire.h* et
+*repertoire.c* qui utilisent l'interface en ligne de commande et prennent
 le nom du répertoire.
 
 Ajoutez la déclaration suivante en repertoire.h
 ```
-              void lire_dossier(char *);             
+void lire_dossier(char *);             
 ```
 
-Implémentez cette fonction en repertoire.c qui parcourt le répertoire
-saisi par l'utilisateur et affiche les noms de tous les fichiers (et
-répertoires, si aucun) dans ce répertoire. Vous pouvez utiliser opendir,
-readdir pour parcourir un répertoire.
+Implémentez cette fonction en *repertoire.c* qui parcourt le répertoire
+saisi par l'utilisateur et affiche les noms des fichiers (et
+répertoires, si aucun) dans ce répertoire. Vous pouvez utiliser `opendir`,
+`readdir` pour parcourir un répertoire.
 
 
 #### Exercice 5.2 [★]
 
 
-Ajoutez la déclaration suivante en repertoire.h
+Ajoutez la déclaration suivante en *repertoire.h*
 
 ```
 void lire_dossier_recursif(char *);             
 ```
 
-Implémentez la fonction en repertoire.c qui parcourt le répertoire saisi
-par l'utilisateur en récursif et affiche tous les noms de tous les
-fichiers et répertoires, sous-répertoires et tous les fichiers dans les
+Implémentez la fonction en *repertoire.c* qui parcourt le répertoire saisi
+par l'utilisateur en récursif et affiche tous les noms des
+fichiers, des répertoires, des sous-répertoires et des fichiers dans les
 sous-répertoires. Pour mieux comprendre cette question, testez
 
 ```
@@ -75,7 +75,7 @@ void lire_dossier_iteratif(char *);
 
 Implémentez cette fonction en repertoire.c qui parcourt le répertoire
 saisi par l'utilisateur en mode itératif et affiche tous les noms de
-tous les fichiers et répertoires, sous-répertoires et tous les fichiers
+des fichiers, des répertoires, des sous-répertoires et des fichiers
 dans les sous-répertoires. Mais cette fois, utilisez for (ou while ou
 do..while) pour implémenter cette fonction. Testez votre code.
 
@@ -83,8 +83,8 @@ do..while) pour implémenter cette fonction. Testez votre code.
 #### Exercice 5.4 [★★]
 
 
-Téléchargez les fichiers suivants à partir d'e-campus : client.h,
-client.c, serveur.h, serveur.c, Makefile. Lisez bien tous les fichiers.
+Téléchargez les fichiers suivants à partir d'e-campus : *client.h*,
+*client.c*, *serveur.h*, *serveur.c*, *Makefile*. Lisez bien tous les fichiers.
 Exécutez
 
 ```
@@ -107,7 +107,7 @@ et sur le second terminal
 
 Entrez un message et voyez les affichages sur les deux terminaux.
 
-Modifiez la fonction recois_envoie_message (serveur.c). Quand le
+Modifiez la fonction `recois_envoie_message` (*serveur.c*). Quand le
 serveur reçoit un message, il demande à l'utilisateur de saisir un
 message et envoie ce message au client. Testez votre code. N'oubliez pas
 d'utiliser make (pour la compilation et la génération des fichiers
@@ -119,10 +119,12 @@ exécutables).
 
 Vous avez remarqué les premiers caractères dans chaque message :
 'message' suivi par :. Pour votre prochaine question, on utilisera
-calcule. Modifiez les fichiers client.c et serveur.c pour le support des
+calcule. 
+
+Modifiez les fichiers client.c et serveur.c pour le support des
 calculs simples (+,-,*,...). Ajoutez une fonction
-envoie_operateur_numeros(...) dans le fichier client.c et
-recois_numeros_calcule(...) dans le fichier serveur.c. Le client
+`envoie_operateur_numeros(...)` dans le fichier client.c et
+`recois_numeros_calcule(...)` dans le fichier serveur.c. Le client
 envoie l'opérateur et un (ou deux) numéros et le serveur envoie le
 résultat. Par exemple, si le client envoie le message
 
@@ -141,7 +143,6 @@ Testez votre code avec les numéros flottants et entiers.
 
 #### Exercice 5.6 [★★★]
 
-
 Pour votre dernière question, téléchargez le dossier etudiant. Dans ce
 dossier, il y a 5 notes de 5 étudiants. Utilisez
 envoie_operateur_numeros (voir 6) pour calculer la somme total des
@@ -154,7 +155,7 @@ la multiplication côté serveur, mais en utilisant 2 nombres à la fois.
 Le but de l'exercice final est de calculer la somme de 5 notes et la moyenne pour chaque élève 
 et pour la classe de 5 élèves (les détails sont stockés dans le répertoire). 
 
-Sans aucune modification du côté serveur, vous devez assurer une série d'opérations côté client pour obtenir ces résultats
+Vous devez assurer une série d'opérations côté client pour obtenir ces résultats
 
 Par exemple, le client effectue une série d'appels suivants :
 ```
@@ -164,6 +165,10 @@ Par exemple, le client effectue une série d'appels suivants :
 / somme 5
 ```
 
+Vous devrez modifier le serveur pour qu'il puisse lire et répondre aux messages du client dans une boucle infinie.  
+
+Pour cet exercice, le serveur ne doit pas lire d'informations provenant des fichiers de l'élève. Le but du serveur est d'effectuer des calculs arithmétiques simples. Seul le client peut lire les fichiers relatifs aux notes des élèves et envoyer une série de messages au serveur pour obtenir la somme totale, la moyenne, etc. 
+
 
 #### Fichiers
 
@@ -172,9 +177,9 @@ serveur.h*
 
 #### Instructions
 
--   Ne pas oublier les commentaires (nom de fichier, objectif, auteurs,
+-   N'oubliez pas les commentaires (nom de fichier, objectif, auteurs,
     , les lignes importantes de code etc.). Les commentaires sont notés.
--   N'oublier pas de mettre à jour le fichier README et ajouter les
+-   N'oubliez pas de mettre à jour le fichier README et ajouter les
     détails concernant votre deuxième exercice.
 -   Compte rendu en format .zip en un seul fichier.
 
