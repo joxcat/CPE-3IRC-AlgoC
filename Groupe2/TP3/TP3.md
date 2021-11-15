@@ -96,7 +96,7 @@ Vous devez afficher
 #### Exercice 3.8 [★★★]
 
 
-Écrivez un programme *chercher.c* qui créer un tableau de 10 phrases (un
+Écrivez un programme *chercher_char.c* qui créer un tableau de 10 phrases (un
 tableau de tableau de caractères). Sans utilisant les fonctions de
 bibliothèques standards ou externes, cherchez si une phrase est dans le
 tableau ou pas. 
