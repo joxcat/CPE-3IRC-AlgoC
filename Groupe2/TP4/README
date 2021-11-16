@@ -1,15 +1,14 @@
-# Bibliothèques
-* 
-*
+# Auteurs
+* Johan Planchon
 
 # Références
-*
-*
+* https://www.includehelp.com/c/c-program-to-read-string-with-spaces-using-scanf-function.aspx
 
-# Difficulté
-*
+# Bibliothèques
+* stdio.h 
+* stdlib.h
+* string.h 
 
-# Commentaires
-* 
-* 
-
+# Difficultées
+* quelques difficultées avec la gestion de la mémoire et les malloc de etudiant_db.c, liste.c et chercherfichier.c 
+* problèmes avec les espaces et les scanf

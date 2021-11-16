@@ -54,3 +54,4 @@ dkms.conf
 # Every compiled file in src/
 **/src/*
 !**/src/*.c
+!**/src/*.h

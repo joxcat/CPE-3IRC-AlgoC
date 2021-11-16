@@ -7,3 +7,6 @@
 * string.h 
 * limits.h
 * time.h
+
+# Difficultées
+* quelques difficultées avec la gestion de la mémoire et les malloc de etudiant.c
