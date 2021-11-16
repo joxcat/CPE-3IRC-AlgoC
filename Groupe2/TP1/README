@@ -1,5 +1,5 @@
-**CONTRIBUTORS**
-1. PLANCHON Johan
+# Auteurs
+* Johan PLANCHON
 
 # Bibliothèques
 * stdio.h
@@ -9,6 +9,8 @@
 * https://stackoverflow.com/questions/7207391/the-tilde-operator-in-c
 
 # Difficulté
+* facile
+
+# Commentaires
 * Quelques difficultées a se rememorer les formules mathématiques
 * Utilisation des opérateurs binaires
-

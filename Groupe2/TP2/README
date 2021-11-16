@@ -8,5 +8,8 @@
 * limits.h
 * time.h
 
+# Références
+* Le language server ccls 
+
 # Difficultées
-* quelques difficultées avec la gestion de la mémoire et les malloc de etudiant.c
+* facile
