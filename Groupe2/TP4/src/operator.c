@@ -17,6 +17,8 @@
 
 #include <stdio.h>
 
+#include "operator.h"
+
 int somme(int num1, int num2) {
     return num1 + num2;
 }

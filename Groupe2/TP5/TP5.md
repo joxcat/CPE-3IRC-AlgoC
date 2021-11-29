@@ -38,7 +38,7 @@ void lire_dossier(char *);
 
 Implémentez cette fonction en *repertoire.c* qui parcourt le répertoire
 saisi par l'utilisateur et affiche les noms des fichiers (et
-répertoires, si aucun) dans ce répertoire. Vous pouvez utiliser `opendir`,
+répertoires, si aucun) dans ce répertoire. Vous pouvez utiliser `o  pendir`,
 `readdir` pour parcourir un répertoire.
 
 

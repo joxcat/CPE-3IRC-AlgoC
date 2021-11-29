@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fichier.h"
+
 #define MESSAGE_MAX_LENGTH 140
 
 void lire_fichier(char * nom_de_fichier) {

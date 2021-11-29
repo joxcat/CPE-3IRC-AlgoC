@@ -3,6 +3,8 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
+ * serveur.c
+ * Johan Planchon <johan.planchon@cpe.fr>
  */
 
 #include <sys/types.h> 
@@ -15,6 +17,7 @@
 #include <unistd.h>
 
 #include "serveur.h"
+#include "operator.h"
 
 /* renvoyer un message (*data) au client (client_socket_fd)
  */
@@ -25,6 +28,8 @@ int renvoie_message(int client_socket_fd, char *data) {
     perror("erreur ecriture");
     return(EXIT_FAILURE);
   }
+
+  return(0);
 }
 
 /* accepter la nouvelle connection d'un client et lire les données
@@ -33,9 +38,9 @@ int renvoie_message(int client_socket_fd, char *data) {
  */
 int recois_envoie_message(int socketfd) {
   struct sockaddr_in client_addr;
-  char data[1024];
+  char data[MAX_MESSAGE_LENGTH];
 
-  int client_addr_len = sizeof(client_addr);
+  socklen_t client_addr_len = sizeof(client_addr);
  
   // nouvelle connection de client
   int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
@@ -57,19 +62,80 @@ int recois_envoie_message(int socketfd) {
   
   /*
    * extraire le code des données envoyées par le client. 
-   * Les données envoyées par le client peuvent commencer par le mot "message :" ou un autre mot.
+   * Les données envoyées par le client peuvent commencer par le mot "message:" ou un autre mot.
    */
-  printf ("Message recu: %s\n", data);
-  char code[10];
-  sscanf(data, "%s:", code);
+  printf ("Données recu: %s\n", data);
+  char code[MAX_CODE_LENGTH] = "";
+  char content[MAX_CONTENT_LENGTH] = "";
+  sscanf(data, "%s: %s", code, content);
 
   //Si le message commence par le mot: 'message:' 
   if (strcmp(code, "message:") == 0) {
-    renvoie_message(client_socket_fd, data);
+    char server_response[MAX_CONTENT_LENGTH];
+    printf("Reponse au client: ");
+    scanf("%s", server_response);
+
+    char response[MAX_MESSAGE_LENGTH] = "message: ";
+    strcat(response, server_response);
+
+    renvoie_message(client_socket_fd, response);
+  } else if (strcmp(code, "calcul:") == 0) {
+    char server_response[MAX_MESSAGE_LENGTH] = "calcul: ";
+    strcat(server_response, recois_numeros_calcule(content));
+
+    renvoie_message(client_socket_fd, server_response);
   }
 
   //fermer le socket 
   close(socketfd);
+
+  return(0);
+}
+
+char * clean_msg(char * msg_start) {
+  while (*msg_start == ' ') msg_start++;
+
+  char * msg_end = msg_start + strlen(msg_start) - 1;
+  while (msg_end > msg_start && (*msg_end == ' ' || *msg_end == '\n')) msg_end--;
+
+  msg_end[1] = '\0';
+
+  return msg_start;
+}
+
+char * recois_numeros_calcule(char * calc) {
+  /* calc = clean_msg(calc); */
+
+  printf("YES '%s'", calc);
+  char * result = malloc(MAX_CONTENT_LENGTH * sizeof(char));
+
+  char op;
+  int num1;
+  int num2;
+
+  sscanf(calc, "%c %d %d", &op, &num1, &num2);
+
+  switch (op) {
+  case '+':
+    sprintf(result, "%d", somme(num1, num2));
+    break;
+  case '-':
+    break;
+  case '*':
+    break;
+  case '/':
+    break;
+  case '%':
+    break;
+  case '&':
+    break;
+  case '|':
+    break;
+  case '~':
+    break;
+  }
+
+  return result;
 }
 
 int main() {

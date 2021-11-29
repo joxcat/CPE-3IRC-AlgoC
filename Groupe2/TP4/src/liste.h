@@ -25,11 +25,16 @@
  * parcours(..).
  * */
 
+#ifndef LISTE_H
+#define LISTE_H
+
 struct RGB;
 
-struct RGB new_rgb(char *, char *, char *, char *);
+struct RGB * new_rgb(char *, char *, char *, char *);
 
 struct liste_couleurs;
 
 void insertion(struct RGB *, struct liste_couleurs *);
 void parcours(struct liste_couleurs *);
+
+#endif

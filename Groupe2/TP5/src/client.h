@@ -3,6 +3,8 @@
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
+ * client.h
+ * Johan Planchon <johan.planchon@cpe.fr>
  */
 
 #ifndef __CLIENT_H__
@@ -13,10 +15,17 @@
  */
 #define PORT 8089
 
+/*
+ * taille max d'un message
+ */
+#define MAX_MESSAGE_LENGTH 1024
+
 /* 
  * Fonction d'envoi et de réception de messages
  * Il faut un argument : l'identifiant de la socket
  */
 int envoie_recois_message(int socketfd);
+
+int envoie_operateur_numeros(char * calc);
 
 #endif

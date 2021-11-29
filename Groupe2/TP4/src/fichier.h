@@ -10,5 +10,10 @@
  * fichier et écrire le message saisi par l'utilisateur dans le fichier.
  * */
 
+#ifndef FICHIER_H
+#define FICHIER_H
+
 void lire_fichier(char *);
 void ecrire_dans_fichier(char *, char *);
+
+#endif
