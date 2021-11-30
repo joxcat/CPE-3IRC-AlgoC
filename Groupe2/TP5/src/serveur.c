@@ -18,6 +18,7 @@
 
 #include "serveur.h"
 #include "operator.h"
+#include "combinator.h"
 
 /* renvoyer un message (*data) au client (client_socket_fd)
  */
@@ -36,54 +37,59 @@ int renvoie_message(int client_socket_fd, char *data) {
  * envoyées par le client. En suite, le serveur envoie un message
  * en retour
  */
-int recois_envoie_message(int socketfd) {
+int recois_envoie_message(int socketfd, double * total_sum) {
   struct sockaddr_in client_addr;
   char data[MAX_MESSAGE_LENGTH];
 
   socklen_t client_addr_len = sizeof(client_addr);
- 
-  // nouvelle connection de client
-  int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
-  if (client_socket_fd < 0 ) {
-    perror("accept");
-    return(EXIT_FAILURE);
-  }
 
-  // la réinitialisation de l'ensemble des données
-  memset(data, 0, sizeof(data));
+  while (1) {
+    // nouvelle connection de client
+    int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
+    if (client_socket_fd < 0 ) {
+      perror("accept");
+      return(EXIT_FAILURE);
+    }
 
-  //lecture de données envoyées par un client
-  int data_size = read (client_socket_fd, (void *) data, sizeof(data));
-      
-  if (data_size < 0) {
-    perror("erreur lecture");
-    return(EXIT_FAILURE);
-  }
-  
-  /*
-   * extraire le code des données envoyées par le client. 
-   * Les données envoyées par le client peuvent commencer par le mot "message:" ou un autre mot.
-   */
-  printf ("Données recu: %s\n", data);
-  char code[MAX_CODE_LENGTH] = "";
-  char content[MAX_CONTENT_LENGTH] = "";
-  sscanf(data, "%s: %s", code, content);
+    // la réinitialisation de l'ensemble des données
+    memset(data, 0, sizeof(data));
 
-  //Si le message commence par le mot: 'message:' 
-  if (strcmp(code, "message:") == 0) {
-    char server_response[MAX_CONTENT_LENGTH];
-    printf("Reponse au client: ");
-    scanf("%s", server_response);
+    //lecture de données envoyées par un client
+    int data_size = read (client_socket_fd, (void *) data, sizeof(data));
 
-    char response[MAX_MESSAGE_LENGTH] = "message: ";
-    strcat(response, server_response);
+    if (data_size < 0) {
+      perror("erreur lecture");
+      return(EXIT_FAILURE);
+    }
 
-    renvoie_message(client_socket_fd, response);
-  } else if (strcmp(code, "calcul:") == 0) {
-    char server_response[MAX_MESSAGE_LENGTH] = "calcul: ";
-    strcat(server_response, recois_numeros_calcule(content));
+    /*
+    * extraire le code des données envoyées par le client.
+    * Les données envoyées par le client peuvent commencer par le mot "message:" ou un autre mot.
+    */
+    printf ("Données recu: %s\n", data);
+    char code[MAX_CODE_LENGTH] = "";
+    char * content = "";
+    sscanf(data, "%s:", code);
+    content = data + strlen(code);
 
-    renvoie_message(client_socket_fd, server_response);
+    //Si le message commence par le mot: 'message:'
+    if (strcmp(code, "message:") == 0) {
+      char server_response[MAX_CONTENT_LENGTH];
+      printf("Reponse au client: ");
+      scanf("%s", server_response);
+
+      char response[MAX_MESSAGE_LENGTH] = "message: ";
+      strcat(response, server_response);
+
+      renvoie_message(client_socket_fd, response);
+    } else if (strcmp(code, "calcul:") == 0) {
+      char server_response[MAX_MESSAGE_LENGTH] = "calcul: ";
+      char * calc = recois_numeros_calcule(content, total_sum);
+      strcat(server_response, calc);
+
+      renvoie_message(client_socket_fd, server_response);
+      free(calc);
+    }
   }
 
   //fermer le socket 
@@ -103,36 +109,121 @@ char * clean_msg(char * msg_start) {
   return msg_start;
 }
 
-char * recois_numeros_calcule(char * calc) {
-  /* calc = clean_msg(calc); */
+COMBINATOR_PTR operator(char * input) {
+  return is_n(input, 1, (PTR)match_operator);
+}
 
-  printf("YES '%s'", calc);
+COMBINATOR_PTR nums(char * input) {
+  return while_is_0(input, (PTR)is_alnum);
+}
+
+char * recois_numeros_calcule(char * calc, double * total_sum) {
+  calc = clean_msg(calc);
+
   char * result = malloc(MAX_CONTENT_LENGTH * sizeof(char));
 
-  char op;
-  int num1;
-  int num2;
+  PTR combinators[] = { (PTR)operator, (PTR)whitespaces, (PTR)nums, (PTR)whitespaces, (PTR)nums, (PTR)NULL };
+  TUPLE_PTR parse = tuple(calc, combinators);
 
-  sscanf(calc, "%c %d %d", &op, &num1, &num2);
+  if (parse == NULL) {
+    printf("ERROR Cannot parse the operation");
+    exit(EXIT_FAILURE);
+  }
+
+  COMBINATOR_PTR comb_op = parse[0];
+  if (comb_op == NULL) {
+    printf("OPERATOR NOT SUPPORTED");
+    exit(EXIT_FAILURE);
+  }
+  char op = ((char *)(comb_op[1]))[0];
+
+  COMBINATOR_PTR comb_unparsed_num1 = parse[2];
+  if (comb_unparsed_num1 == NULL) {
+    printf("num1 unparsable");
+    exit(EXIT_FAILURE);
+  }
+  char * unparsed_num1 = (char *)comb_unparsed_num1[1];
+  if (strlen(unparsed_num1) == 0) {
+    printf("num1 was not provided");
+    exit(EXIT_FAILURE);
+  }
+
+  COMBINATOR_PTR comb_unparsed_num2 = parse[4];
+  char * unparsed_num2 = malloc(MAX_CONTENT_LENGTH * sizeof(char));
+  if (comb_op == NULL) {
+    unparsed_num2 = "";
+  } else {
+    unparsed_num2 = (char *)comb_unparsed_num2[1];
+  }
+
+  double num1;
+  double num2;
+
+  if (strcmp(unparsed_num1, "somme") == 0) {
+    num1 = *total_sum;
+  } else {
+    num1 = atof(unparsed_num1);
+  }
+
+  if (strcmp(unparsed_num2, "somme") == 0) {
+    num2 = *total_sum;
+  } else {
+    num2 = atof(unparsed_num2);
+  }
 
   switch (op) {
-  case '+':
-    sprintf(result, "%d", somme(num1, num2));
-    break;
-  case '-':
-    break;
-  case '*':
-    break;
-  case '/':
-    break;
-  case '%':
-    break;
-  case '&':
-    break;
-  case '|':
-    break;
-  case '~':
-    break;
+    case '+': {
+      double calc_result = somme(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%f", calc_result);
+      break;
+    }
+    case '-': {
+      double calc_result = difference(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%f", calc_result);
+      break;
+    }
+    case '*': {
+      double calc_result = produit(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%f", calc_result);
+      break;
+    }
+    case '/': {
+      double calc_result = quotient(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%f", calc_result);
+      break;
+    }
+    case '%': {
+      int calc_result = modulo(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%d", calc_result);
+      break;
+    }
+    case '&': {
+      int calc_result = et(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%d", calc_result);
+      break;
+    }
+    case '|': {
+      int calc_result = ou(num1, num2);
+      *total_sum += calc_result;
+      sprintf(result, "%d", calc_result);
+      break;
+    }
+    case '~': {
+      int calc_result = neg(num1);
+      *total_sum += calc_result;
+      sprintf(result, "%d", calc_result);
+      break;
+    }
+    case '=': {
+      sprintf(result, "%f", num1);
+      break;
+    }
   }
 
   return result;
@@ -175,7 +266,9 @@ int main() {
   listen(socketfd, 10);
 
   //Lire et répondre au client
-  recois_envoie_message(socketfd);
+  // NOTE: Sum from the start of the program
+  double total_sum = 0;
+  recois_envoie_message(socketfd, &total_sum);
 
   return 0;
 }

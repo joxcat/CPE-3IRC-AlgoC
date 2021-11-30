@@ -8,10 +8,10 @@
 #define OPERATOR_H
 
 int match_operator(char);
-int somme(int, int);
-int difference(int, int);
-int produit(int, int);
-float quotient(int, int);
+double somme(double, double);
+double difference(double, double);
+double produit(double, double);
+double quotient(double, double);
 int modulo(int, int);
 int et(int, int);
 int ou(int, int);

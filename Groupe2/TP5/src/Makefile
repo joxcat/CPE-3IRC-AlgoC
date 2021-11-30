@@ -2,8 +2,8 @@ CC ?= gcc
 
 CFLAGS=-Wall -Wextra -g
 
-COBJS ?= client.o operator.o
-SOBJS ?= serveur.o operator.o
+COBJS ?= client.o operator.o combinator.o
+SOBJS ?= serveur.o operator.o combinator.o
 
 .SUFFIXES: .c .o
 

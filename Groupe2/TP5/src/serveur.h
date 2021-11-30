@@ -20,7 +20,7 @@
  * envoyées par le client. En suite, le serveur envoie un message
  * en retour
  */
-int recois_envoie_message(int socketfd);
-char * recois_numeros_calcule(char * calc);
+int recois_envoie_message(int socketfd, double * total_sum);
+char * recois_numeros_calcule(char * calc, double * total_sum);
 
 #endif

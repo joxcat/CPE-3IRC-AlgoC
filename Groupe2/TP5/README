@@ -6,6 +6,7 @@
 * https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
 * https://www.lemoda.net/c/recursive-directory/
 * Code fourni dans le TP serveur.c / serveur.h / client.c / client.h / Makefile
+* https://www.gamedev.net/forums/topic/687109-function-that-returns-a-function-pointer/5335426/
 
 # Bibliothèques
 * stdio.h 
@@ -13,5 +14,12 @@
 * string.h 
 * dirent.h
 * sys/types.h 
+* ctype.h
+* unistd.h
+* sys/socket.h
+* netinet/in.h
+* linux/limits.h
+* sys/epoll.h
 
 # Difficultées
+* Difficile pour parser correctement les char *
