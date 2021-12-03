@@ -41,8 +41,7 @@ int recois_envoie_message(int socketfd, double * total_sum) {
   struct sockaddr_in client_addr;
   char data[MAX_MESSAGE_LENGTH];
 
-  socklen_t client_addr_len = sizeof(client_addr);
-
+  unsigned int client_addr_len = sizeof(client_addr);
   while (1) {
     // nouvelle connection de client
     int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
@@ -229,9 +228,8 @@ int main() {
 
   int socketfd;
   int bind_status;
-  int client_addr_len;
 
-  struct sockaddr_in server_addr, client_addr;
+  struct sockaddr_in server_addr;
 
   /*
    * Creation d'une socket

@@ -181,3 +181,4 @@ int is_alphanumeric(char c) {
 
 CombinatorResult* while_alphanumeric(char * input) {
     return while_is(is_alphanumeric, input);
+}
