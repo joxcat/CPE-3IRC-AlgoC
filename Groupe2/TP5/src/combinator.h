@@ -1,6 +1,7 @@
 /**
  * combinator.h
  * Johan Planchon <johan.planchon@cpe.fr>
+ * version: v0.2.0
  *
  * Inspired by https://github.com/Geal/nom
  * */
@@ -8,38 +9,39 @@
 #ifndef COMBINATOR_H
 #define COMBINATOR_H
 
-#define PTR unsigned long int
-// [char * next, char * match]
-// next => text after the match
-// match => text which matched
-#define COMBINATOR_PTR PTR *
-#define COMBINATOR_PTR_SIZE sizeof(COMBINATOR_PTR) * 2
 #define MAX_MATCH_DEPTH 1000
-#define COMBINATOR_FN COMBINATOR_PTR(*)(char *)
-// (char) => int
-#define CHAR_FN PTR
 
-COMBINATOR_PTR tag(char *, char *);
-COMBINATOR_PTR is_n(char *, int, CHAR_FN);
-COMBINATOR_PTR while_is_0(char *, CHAR_FN);
+typedef struct {
+    char * next;
+    char match[MAX_MATCH_DEPTH];
+} CombinatorResult;
 
-// [int selected_combinator_index, COMBINATOR_PTR result]
-// one_of(input, combinators_to_try)
-#define ONE_OF_PTR PTR *
-ONE_OF_PTR one_of(char *, PTR *);
+typedef CombinatorResult* (*CombinatorFn)(char *);
 
-// [PTR, ...]
-// tuple(input, combinators_to_apply_in_sequence)
-#define TUPLE_PTR COMBINATOR_PTR *
-TUPLE_PTR tuple(char *, PTR *);
+CombinatorResult* tag(const char *, char *);
 
-int is_number(char);
-int is_whitespace(char);
-COMBINATOR_PTR whitespaces(char *);
-int is_alpha(char);
-int is_alnum(char);
-int is_alpha(char);
-int is_alpha(char);
-int is_alpha(char);
+typedef int (*IsFn)(char);
+CombinatorResult* take_is(int, IsFn, char *);
+CombinatorResult* while_is(IsFn, char *);
+
+typedef struct {
+    int combinator_index;
+    CombinatorResult* combinator_result;
+} AltResult;
+typedef AltResult (*AltFn)(char *);
+AltResult* alt(CombinatorFn *, char *);
+
+typedef CombinatorResult* TupleResult;
+typedef TupleResult (*TupleFn)(char *);
+TupleResult* tuple(CombinatorFn *, char *);
+
+int is_digit(char);
+CombinatorResult* while_digit(char *);
+int is_space(char);
+CombinatorResult* while_space(char *);
+int is_alphabetic(char);
+CombinatorResult* while_alphabetic(char *);
+int is_alphanumeric(char);
+CombinatorResult* while_alphanumeric(char *);
 
 #endif

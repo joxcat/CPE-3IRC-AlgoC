@@ -1,6 +1,7 @@
 /**
  * combinator.c
  * Johan Planchon <johan.planchon@cpe.fr>
+ * version: v0.2.0
  *
  * Inspired by https://github.com/Geal/nom
  * */
@@ -12,11 +13,11 @@
 
 #include "combinator.h"
 
-// NOTE: Need to free `result` and `result[1]`
-COMBINATOR_PTR tag(char * input, char * match) {
-    char * matched_part = malloc(MAX_MATCH_DEPTH * sizeof(char));
+CombinatorResult* tag(const char* match, char* input) {
+    CombinatorResult* result = malloc(sizeof (CombinatorResult));
+
     int matched_count = 0;
-    strcpy(matched_part, "");
+    strcpy(result->match, "");
 
     int match_depth = 0;
     int is_matching = 1;
@@ -25,130 +26,113 @@ COMBINATOR_PTR tag(char * input, char * match) {
         if (input[match_depth] != match[match_depth]) {
             is_matching = 0;
         } else {
-            matched_part[matched_count] = input[match_depth];
+            result->match[matched_count] = input[match_depth];
             matched_count++;
         }
 
         match_depth++;
     }
 
-    COMBINATOR_PTR result = malloc(COMBINATOR_PTR_SIZE);
-
-    result[0] = (PTR)(input + matched_count);
-    result[1] = (PTR)matched_part;
+    result->next = (input + matched_count);
 
     return result;
 }
 
-// NOTE: Need to free `result` and `result[1]`
-COMBINATOR_PTR is_n(char * input, int fn_times, PTR fn) {
-    char * matched_part = malloc(MAX_MATCH_DEPTH * sizeof(char));
+CombinatorResult* take_is(int fn_times, IsFn is, char* input) {
+    CombinatorResult* result = malloc(sizeof (CombinatorResult));
+
     int matched_count = 0;
-    strcpy(matched_part, "");
+    strcpy(result->match, "");
 
     int match_depth = 0;
     int is_matching = 1;
-
-    int (*test_is)(char) = (int (*)(char))fn;
 
     while (match_depth <= MAX_MATCH_DEPTH && is_matching == 1 && matched_count < fn_times) {
-        if (test_is(input[match_depth]) == 0) {
+        if (is(input[match_depth]) == 0) {
             is_matching = 0;
         } else {
-            matched_part[matched_count] = input[match_depth];
+            result->match[matched_count] = input[match_depth];
             matched_count++;
         }
 
         match_depth++;
     }
 
-    COMBINATOR_PTR result = malloc(COMBINATOR_PTR_SIZE);
-
-    result[0] = (PTR)(input + matched_count);
-    result[1] = (PTR)matched_part;
+    result->next = (input + matched_count);
 
     return result;
 
 }
 
-// NOTE: Need to free `result` and `result[1]`
-COMBINATOR_PTR while_is_0(char * input, PTR fn) {
-    char * matched_part = malloc(MAX_MATCH_DEPTH * sizeof(char));
+CombinatorResult* while_is(IsFn is, char* input) {
+    CombinatorResult* result = malloc(sizeof (CombinatorResult));
+
     int matched_count = 0;
-    strcpy(matched_part, "");
+    strcpy(result->match, "");
 
     int match_depth = 0;
     int is_matching = 1;
-
-    int (*is)(char) = (int (*)(char))fn;
 
     while (match_depth <= MAX_MATCH_DEPTH && is_matching == 1) {
         if (is(input[match_depth]) == 0) {
             is_matching = 0;
         } else {
-            matched_part[matched_count] = input[match_depth];
+            result->match[matched_count] = input[match_depth];
             matched_count++;
         }
 
         match_depth++;
     }
 
-    COMBINATOR_PTR result = malloc(COMBINATOR_PTR_SIZE);
-
-    result[0] = (PTR)(input + matched_count);
-    result[1] = (PTR)matched_part;
+    result->next = (input + matched_count);
 
     return result;
 }
 
-// NOTE: Need to free `result`, `result[0]` and depending on the combinator `result[1]`
-ONE_OF_PTR one_of(char * input, PTR * combinators_to_try) {
-    ONE_OF_PTR result = malloc(sizeof(PTR) * 2);
-    result[1] = (PTR)NULL;
+AltResult* alt(CombinatorFn* combinators_to_try, char* input) {
+    AltResult* result = malloc(sizeof(AltResult));
+    result->combinator_result = NULL;
+    result->combinator_index = 0;
 
-    int * selected_combinator = malloc(sizeof(int));
-    *selected_combinator = 0;
+    while (combinators_to_try[result->combinator_index] != NULL && result->combinator_result == NULL) {
+        CombinatorFn combinator = combinators_to_try[result->combinator_index];
+        CombinatorResult* combinator_result = combinator(input);
 
-    while (combinators_to_try[*selected_combinator] != (PTR)NULL && result[1] == (PTR)NULL) {
-        COMBINATOR_PTR (*combinator)(char *) = (COMBINATOR_FN)combinators_to_try[*selected_combinator];
-        COMBINATOR_PTR combinator_result = combinator(input);
-
-        if (strlen((char *)combinator_result[1]) > 0) {
-            result[1] = (PTR)combinator_result;
+        if (strlen(combinator_result->match) > 0) {
+            result->combinator_result = combinator_result;
         } else {
             free(combinator_result);
         }
 
-        selected_combinator++;
+        result->combinator_index++;
     }
 
-    if (result[1] == (PTR)NULL) {
-        *selected_combinator = -1;
+    if (result->combinator_result == NULL) {
+        result->combinator_index = -1;
     }
 
-    result[0] = (PTR)selected_combinator;
     return result;
 }
 
-// NOTE: Need to free every combinator in `result`
-TUPLE_PTR tuple(char * input, PTR * combinators_to_apply) {
+TupleResult* tuple(CombinatorFn* combinators_to_apply, char* input) {
     int combinators_count = 0;
 
-    while (combinators_to_apply[combinators_count] != (PTR)NULL) combinators_count++;
+    while (combinators_to_apply[combinators_count] != NULL) combinators_count++;
 
     if (combinators_count == 0) {
-        return (TUPLE_PTR)NULL;
+        return NULL;
     } else {
-        TUPLE_PTR result = malloc(COMBINATOR_PTR_SIZE * combinators_count);
+        TupleResult* result = malloc(sizeof(CombinatorResult) * combinators_count);
 
         char * next = malloc(strlen(input) * sizeof(char));
         strcpy(next, input);
 
         int selected_combinator = 0;
 
-        while (combinators_to_apply[selected_combinator] != (PTR)NULL) {
-            COMBINATOR_PTR (*combinator)(char *) = (COMBINATOR_FN)combinators_to_apply[selected_combinator];
-            COMBINATOR_PTR combinator_result = combinator(next);
+        while (combinators_to_apply[selected_combinator] != NULL) {
+            printf("%s\n", next);
+            CombinatorFn combinator = combinators_to_apply[selected_combinator];
+            CombinatorResult* combinator_result = combinator(next);
 
             if (next == NULL) {
                 result[selected_combinator] = NULL;
@@ -156,7 +140,7 @@ TUPLE_PTR tuple(char * input, PTR * combinators_to_apply) {
                 next = NULL;
                 result[selected_combinator] = NULL;
             } else {
-                next = (char *)combinator_result[0];
+                next = combinator_result->next;
                 result[selected_combinator] = combinator_result;
             }
 
@@ -167,22 +151,34 @@ TUPLE_PTR tuple(char * input, PTR * combinators_to_apply) {
     }
 }
 
-int is_number(char c) {
-    return is_number(c);
+int is_digit(char c) {
+    return isdigit(c);
 }
 
-int is_whitespace(char c) {
+CombinatorResult* while_digit(char * input) {
+    return while_is(is_digit, input);
+}
+
+int is_space(char c) {
     return isblank(c);
 }
 
-COMBINATOR_PTR whitespaces(char * input) {
-  return while_is_0(input, (PTR)is_whitespace);
+CombinatorResult* while_space(char * input) {
+  return while_is(is_space, input);
 }
 
-int is_alpha(char c) {
+int is_alphabetic(char c) {
     return isalpha(c);
 }
 
-int is_alnum(char c) {
+CombinatorResult* while_alphabetic(char * input) {
+    return while_is(is_alphabetic, input);
+}
+
+int is_alphanumeric(char c) {
     return isalnum(c);
+}
+
+CombinatorResult* while_alphanumeric(char * input) {
+    return while_is(is_alphanumeric, input);
 }

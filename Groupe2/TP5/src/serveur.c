@@ -109,12 +109,8 @@ char * clean_msg(char * msg_start) {
   return msg_start;
 }
 
-COMBINATOR_PTR operator(char * input) {
-  return is_n(input, 1, (PTR)match_operator);
-}
-
-COMBINATOR_PTR nums(char * input) {
-  return while_is_0(input, (PTR)is_alnum);
+CombinatorResult* take_operator(char * input) {
+  return take_is(1, match_operator, input);
 }
 
 char * recois_numeros_calcule(char * calc, double * total_sum) {
@@ -122,38 +118,38 @@ char * recois_numeros_calcule(char * calc, double * total_sum) {
 
   char * result = malloc(MAX_CONTENT_LENGTH * sizeof(char));
 
-  PTR combinators[] = { (PTR)operator, (PTR)whitespaces, (PTR)nums, (PTR)whitespaces, (PTR)nums, (PTR)NULL };
-  TUPLE_PTR parse = tuple(calc, combinators);
+  CombinatorFn combinators[] = { take_operator, while_space, while_alphanumeric, while_space, while_alphanumeric, NULL };
+  TupleResult* parse = tuple(combinators, calc);
 
   if (parse == NULL) {
     printf("ERROR Cannot parse the operation");
     exit(EXIT_FAILURE);
   }
 
-  COMBINATOR_PTR comb_op = parse[0];
+  CombinatorResult* comb_op = parse[0];
   if (comb_op == NULL) {
     printf("OPERATOR NOT SUPPORTED");
     exit(EXIT_FAILURE);
   }
-  char op = ((char *)(comb_op[1]))[0];
+  char op = comb_op->match[0];
 
-  COMBINATOR_PTR comb_unparsed_num1 = parse[2];
+  CombinatorResult* comb_unparsed_num1 = parse[2];
   if (comb_unparsed_num1 == NULL) {
     printf("num1 unparsable");
     exit(EXIT_FAILURE);
   }
-  char * unparsed_num1 = (char *)comb_unparsed_num1[1];
+  char* unparsed_num1 = comb_unparsed_num1->match;
   if (strlen(unparsed_num1) == 0) {
     printf("num1 was not provided");
     exit(EXIT_FAILURE);
   }
 
-  COMBINATOR_PTR comb_unparsed_num2 = parse[4];
-  char * unparsed_num2 = malloc(MAX_CONTENT_LENGTH * sizeof(char));
-  if (comb_op == NULL) {
+  CombinatorResult* comb_unparsed_num2 = parse[4];
+  char* unparsed_num2;
+  if (comb_unparsed_num2 == NULL) {
     unparsed_num2 = "";
   } else {
-    unparsed_num2 = (char *)comb_unparsed_num2[1];
+    unparsed_num2 = comb_unparsed_num2->match;
   }
 
   double num1;
@@ -162,13 +158,13 @@ char * recois_numeros_calcule(char * calc, double * total_sum) {
   if (strcmp(unparsed_num1, "somme") == 0) {
     num1 = *total_sum;
   } else {
-    num1 = atof(unparsed_num1);
+    num1 = strtod(unparsed_num1, NULL);
   }
 
   if (strcmp(unparsed_num2, "somme") == 0) {
     num2 = *total_sum;
   } else {
-    num2 = atof(unparsed_num2);
+    num2 = strtod(unparsed_num2, NULL);
   }
 
   switch (op) {
@@ -197,25 +193,25 @@ char * recois_numeros_calcule(char * calc, double * total_sum) {
       break;
     }
     case '%': {
-      int calc_result = modulo(num1, num2);
+      int calc_result = modulo((int)num1, (int)num2);
       *total_sum += calc_result;
       sprintf(result, "%d", calc_result);
       break;
     }
     case '&': {
-      int calc_result = et(num1, num2);
+      int calc_result = et((int)num1, (int)num2);
       *total_sum += calc_result;
       sprintf(result, "%d", calc_result);
       break;
     }
     case '|': {
-      int calc_result = ou(num1, num2);
+      int calc_result = ou((int)num1, (int)num2);
       *total_sum += calc_result;
       sprintf(result, "%d", calc_result);
       break;
     }
     case '~': {
-      int calc_result = neg(num1);
+      int calc_result = neg((int)num1);
       *total_sum += calc_result;
       sprintf(result, "%d", calc_result);
       break;
