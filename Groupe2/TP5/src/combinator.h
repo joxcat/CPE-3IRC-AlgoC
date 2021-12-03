@@ -1,7 +1,7 @@
 /**
  * combinator.h
  * Johan Planchon <johan.planchon@cpe.fr>
- * version: v0.2.0
+ * version: v0.2.1
  *
  * Inspired by https://github.com/Geal/nom
  * */
@@ -28,11 +28,9 @@ typedef struct {
     int combinator_index;
     CombinatorResult* combinator_result;
 } AltResult;
-typedef AltResult (*AltFn)(char *);
 AltResult* alt(CombinatorFn *, char *);
 
 typedef CombinatorResult* TupleResult;
-typedef TupleResult (*TupleFn)(char *);
 TupleResult* tuple(CombinatorFn *, char *);
 
 int is_digit(char);

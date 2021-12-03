@@ -1,7 +1,7 @@
 /**
  * combinator.c
  * Johan Planchon <johan.planchon@cpe.fr>
- * version: v0.2.0
+ * version: v0.2.1
  *
  * Inspired by https://github.com/Geal/nom
  * */
