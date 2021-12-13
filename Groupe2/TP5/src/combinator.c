@@ -130,7 +130,6 @@ TupleResult* tuple(CombinatorFn* combinators_to_apply, char* input) {
         int selected_combinator = 0;
 
         while (combinators_to_apply[selected_combinator] != NULL) {
-            printf("%s\n", next);
             CombinatorFn combinator = combinators_to_apply[selected_combinator];
             CombinatorResult* combinator_result = combinator(next);
 
@@ -176,7 +175,7 @@ CombinatorResult* while_alphabetic(char * input) {
 }
 
 int is_alphanumeric(char c) {
-    return isalnum(c);
+    return isalnum(c) || c == '.';
 }
 
 CombinatorResult* while_alphanumeric(char * input) {

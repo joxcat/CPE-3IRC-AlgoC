@@ -20,12 +20,21 @@
  */
 #define MAX_MESSAGE_LENGTH 1024
 
-/* 
+/*
  * Fonction d'envoi et de réception de messages
  * Il faut un argument : l'identifiant de la socket
  */
-int envoie_recois_message(int socketfd);
+char * envoie_recois_message(int socketfd, char * message);
 
 int envoie_operateur_numeros(char * calc);
+
+struct Etu;
+
+#define MAX_ETUS 10000
+#define ETU_NOTE_EXTENSION ".txt"
+#define MAX_BUFFER_SIZE 4096
+#define READ_BUFFER_SIZE 512
+
+int calculs_etus(int socketfd, char * etus_path);
 
 #endif

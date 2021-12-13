@@ -42,23 +42,26 @@ int recois_envoie_message(int socketfd, double * total_sum) {
   char data[MAX_MESSAGE_LENGTH];
 
   unsigned int client_addr_len = sizeof(client_addr);
-  while (1) {
-    // nouvelle connection de client
-    int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
-    if (client_socket_fd < 0 ) {
-      perror("accept");
-      return(EXIT_FAILURE);
-    }
+  // nouvelle connection de client
+  int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
+  if (client_socket_fd < 0 ) {
+    perror("accept");
+    return(EXIT_FAILURE);
+  }
 
+  while (1) {
     // la réinitialisation de l'ensemble des données
     memset(data, 0, sizeof(data));
 
-    //lecture de données envoyées par un client
-    int data_size = read (client_socket_fd, (void *) data, sizeof(data));
+    int data_size = 0;
+    while (data_size == 0) {
+      //lecture de données envoyées par un client
+      data_size = read (client_socket_fd, (void *) data, sizeof(data));
 
-    if (data_size < 0) {
-      perror("erreur lecture");
-      return(EXIT_FAILURE);
+      if (data_size < 0) {
+        perror("erreur lecture");
+        return(EXIT_FAILURE);
+      }
     }
 
     /*
@@ -86,6 +89,7 @@ int recois_envoie_message(int socketfd, double * total_sum) {
       char * calc = recois_numeros_calcule(content, total_sum);
       strcat(server_response, calc);
 
+      printf("= %s =\n", server_response);
       renvoie_message(client_socket_fd, server_response);
       free(calc);
     }
@@ -217,6 +221,7 @@ char * recois_numeros_calcule(char * calc, double * total_sum) {
     }
     case '=': {
       sprintf(result, "%f", num1);
+      *total_sum = num1;
       break;
     }
   }
