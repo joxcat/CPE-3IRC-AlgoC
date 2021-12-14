@@ -28,7 +28,6 @@ void plot(char *data) {
   fprintf(p, "set xrange [-15:15]\n");
   fprintf(p, "set yrange [-15:15]\n");
   fprintf(p, "set style fill transparent solid 0.9 noborder\n");
-  fprintf(p, "set title 'Top 10 colors'\n");
   fprintf(p, "plot '-' with circles lc rgbcolor variable\n");
   while(1) {
     char *token = strtok_r(str, ", ", &saveptr);
@@ -36,14 +35,20 @@ void plot(char *data) {
       break;
     }
     str=NULL;
-    printf("%d: %s\n", count, token);
+    if (count == 0) {
+
+    } else {
+      printf("%d: %s\n", count, token);
+    }
+
     if (count == 1) {
       n = atoi(token);
+      fprintf(p, "set title 'Top %d colors'\n", n);
       printf("n = %d\n", n);
     }
     else {
-      // Le numéro 36, parceque 360° (cercle) / 10 couleurs = 36
-      fprintf(p, "0 0 10 %d %d 0x%s\n", (count-1)*36, count*36, token+1);
+      // parceque 360° (cercle)
+      fprintf(p, "0 0 10 %f %f 0x%s\n", (count-1)*(360.0 / n), count*(360.0 / n), token+1);
     }
     count++;
   }

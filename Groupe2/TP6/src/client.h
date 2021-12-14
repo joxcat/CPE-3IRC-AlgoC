@@ -13,6 +13,11 @@
  */
 #define PORT 8089
 
+/*
+ * taille max d'un message
+ */
+#define MAX_MESSAGE_LENGTH 1024
+
 /* 
  * Fonction d'envoi et de réception de messages
  * Il faut un argument : l'identifiant de la socket

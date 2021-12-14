@@ -23,15 +23,15 @@
 
 int envoie_recois_message(int socketfd) {
  
-  char data[1024];
+  char data[MAX_MESSAGE_LENGTH];
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
 
 
   // Demandez à l'utilisateur d'entrer un message
-  char message[100];
+  char message[MAX_MESSAGE_LENGTH];
   printf("Votre message (max 1000 caracteres): ");
-  fgets(message, 1024, stdin);
+  fgets(message, MAX_MESSAGE_LENGTH, stdin);
   strcpy(data, "message: ");
   strcat(data, message);
   
@@ -61,16 +61,28 @@ void analyse(char *pathname, char *data) {
   //compte de couleurs
   couleur_compteur *cc = analyse_bmp_image(pathname);
 
+  char nb_color[10];
+  printf("Combien de couleurs (<=30) ? ");
+  scanf("%s", nb_color);
+  int nb_color_as_int = atoi(nb_color);
+
+  if (nb_color_as_int > 30) {
+    perror("NB Couleurs > 30");
+    exit(EXIT_FAILURE);
+  }
+
   int count;
   strcpy(data, "couleurs: ");
-  char temp_string[10] = "10,";
+  char temp_string[MAX_MESSAGE_LENGTH];
+  sprintf(temp_string, "%s,", nb_color);
+
   if (cc->size < 10) {
     sprintf(temp_string, "%d,", cc->size);
   }
   strcat(data, temp_string);
   
   //choisir 10 couleurs
-  for (count = 1; count < 11 && cc->size - count >0; count++) {
+  for (count = 1; count < nb_color_as_int + 1 && cc->size - count >0; count++) {
     if(cc->compte_bit ==  BITS32) {
       sprintf(temp_string, "#%02x%02x%02x,", cc->cc.cc24[cc->size-count].c.rouge,cc->cc.cc32[cc->size-count].c.vert,cc->cc.cc32[cc->size-count].c.bleu);
     }
