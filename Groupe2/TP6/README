@@ -1,15 +1,26 @@
+# Auteurs
+* Johan Planchon
+
 # Bibliothèques
-* 
-*
+* stdio.h
+* stdlib.h
+* search.h
+* sys/stat.h
+* sys/types.h
+* fcntl.h
+* unistd.h
+* ctype.h
+* sys/socket.h
+* netinet/in.h
+* sys/epoll.h
 
 # Références
-*
-*
+* Pour combinator.c/h la librairie rust https://github.com/Geal/nom
+* Pour combinator.c/h la version 0.2.1 du TP5
 
 # Difficulté
-*
+* Facile sur les 2 premières questions, difficile sur la dernière
 
 # Commentaires
-* 
-* 
+* Un manque de temps pour réaliser l'étape de parser + générer le JSON 
 
