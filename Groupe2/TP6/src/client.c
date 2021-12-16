@@ -57,7 +57,7 @@ int envoie_recois_message(int socketfd) {
   return 0;
 }
 
-void analyse(char *pathname, char *data) {
+int analyse(char *pathname, char *data) {
   //compte de couleurs
   couleur_compteur *cc = analyse_bmp_image(pathname);
 
@@ -67,8 +67,8 @@ void analyse(char *pathname, char *data) {
   int nb_color_as_int = atoi(nb_color);
 
   if (nb_color_as_int > 30) {
-    perror("NB Couleurs > 30");
-    exit(EXIT_FAILURE);
+    perror("NB Couleurs > 30\n");
+    return -1;
   }
 
   int count;
@@ -94,12 +94,17 @@ void analyse(char *pathname, char *data) {
 
   //enlever le dernier virgule
   data[strlen(data)-1] = '\0';
+
+  return 0;
 }
 
 int envoie_couleurs(int socketfd, char *pathname) {
   char data[1024];
   memset(data, 0, sizeof(data));
-  analyse(pathname, data);
+  if (analyse(pathname, data) < 0) {
+    close(socketfd);
+    exit(EXIT_FAILURE);
+  }
   
   int write_status = write(socketfd, data, strlen(data));
   if ( write_status < 0 ) {
